@@ -18,7 +18,7 @@ This project uses the **HI-Small** variant:
 
 Because the full transaction file is too large to work with comfortably in Power BI Desktop for a scoped project, a **stratified sample** was built using custom Python scripts:
 - All 5,177 flagged transactions were kept in full
-- Non-flagged transactions were randomly sampled at a 10:1 ratio (non-flagged : flagged), producing 56,947 total transactions
+- Non-flagged transactions were sampled at a 10:1 ratio (non-flagged : flagged) using a two-stage approach: as the raw file was streamed in chunks, a random subset of non-flagged rows was pooled from each chunk, then trimmed down to the exact target ratio once the true flagged count was known — necessary because the full file is too large to sample from all at once. This produced 56,947 total transactions.
 - The accounts file was then filtered down to exactly the (Bank, Account) pairs referenced by the sampled transactions, preserving full referential integrity for the Power BI joins
 
 This sampling approach is disclosed explicitly throughout the dashboard — see **Limitations & Caveats**.
@@ -58,6 +58,7 @@ This project is a portfolio demonstration, not a production AML tool, and a few 
 - **The 9% "Flagged %" figure is a sampling artifact, not a real-world laundering rate.** The dataset was intentionally oversampled 10:1 (non-flagged:flagged) to keep the working file size manageable. The true rate in the underlying full dataset is closer to 0.10%. Any percentage calculated from this sample describes the sample, not real-world prevalence.
 - **USD conversion rates are static and illustrative**, entered manually for this project rather than pulled from a live/real-time exchange rate feed. They're accurate enough to demonstrate correct cross-currency methodology, but shouldn't be read as precise financial figures.
 - **This is a synthetic dataset.** IBM's AML dataset is generated to simulate realistic transaction patterns, not real bank data, so findings here illustrate an analytical approach rather than real financial intelligence.
+- **Prioritization ranks by dollar value alone.** This project ranks flagged transactions purely by USD-equivalent amount to identify where review effort would matter most. A production AML program would also weigh risk scoring, transaction typology, and account network patterns rather than dollar value in isolation.
 
 ## Tools Used
 
