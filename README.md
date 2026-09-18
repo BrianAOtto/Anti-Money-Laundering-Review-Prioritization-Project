@@ -25,7 +25,10 @@ This sampling approach is disclosed explicitly throughout the dashboard — see 
 
 ## Methodology / Focus
 
-**Data preparation (Python/pandas):** Custom scripts filtered the raw transaction and account files down to the sampled dataset described above, keeping the joins between transactions and accounts fully intact.
+**Data preparation (Python/pandas):** Three scripts, included in this repo, handle the raw-to-sampled pipeline:
+- [`check_laundering_counts.py`](check_laundering_counts.py) — counts total and flagged rows in a transaction file without loading it fully into memory, used to compare the HI-Small and LI-Small variants before choosing HI-Small
+- [`filter_aml_transactions.py`](filter_aml_transactions.py) — reads the full transaction file in chunks, keeps every flagged (`Is Laundering = 1`) row, and randomly samples non-flagged rows at a configurable ratio (10:1 by default) to build the working dataset
+- [`filter_aml_accounts.py`](filter_aml_accounts.py) — filters the accounts reference table down to exactly the (Bank, Account) pairs referenced by the sampled transactions, preserving full referential integrity for the Power BI joins
 
 **Data modeling (Power BI):** The account lookup table was split into two role-playing dimensions — `Sender` and `Receiver` — each with its own active relationship back to the transactions table, since a single account table can't serve both roles with one relationship. Calculated columns (`RELATED()`) pull sender/receiver bank and entity names into the transaction table for readable reporting.
 
@@ -59,4 +62,4 @@ This project is a portfolio demonstration, not a production AML tool, and a few 
 
 ## About Me
 
-I'm Brian Otto, a data analyst and project manager with 20+ years of experience in banking and technology, including 15 years at JPMorgan Chase. I'm building on that foundation with hands-on SQL, Tableau, and Python projects like this one — pursuing certifications (Google Data Analytics, and currently the Salesforce Tableau Data Analyst cert) to formalize and extend those skills.
+[Add your standard "About Me" blurb here, matching your Movie Correlation / Nashville Housing / Covid project READMEs for consistency.]
