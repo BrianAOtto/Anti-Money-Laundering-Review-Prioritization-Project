@@ -1,3 +1,12 @@
+"""
+Quick check: counts total rows and "Is Laundering" == 1 rows in a transaction
+CSV, without loading the whole file into memory. Use this to compare the
+HI-Small and LI-Small Transaction files before deciding which one to use.
+
+Usage:
+    python check_laundering_counts.py TRANSACTION_FILE.csv
+"""
+
 import sys
 
 import pandas as pd

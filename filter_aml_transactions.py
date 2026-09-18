@@ -1,3 +1,26 @@
+"""
+Filters the IBM AML transaction file down to a manageable working set for Power BI.
+
+What it does:
+  - Reads the (huge) transaction CSV in chunks, so it never loads the whole
+    file into memory at once.
+  - Renames the two duplicate "Account" columns to "From Account" and
+    "To Account" so there's no ambiguity downstream.
+  - Keeps every single row where Is Laundering == 1 (the flagged/confirmed
+    laundering transactions) — these are rare and valuable, so none get lost.
+  - Keeps a random sample of the non-flagged rows, at a ratio you control
+    (default: 10x the number of flagged rows), so the dashboard has enough
+    "normal" transactions for contrast without loading in tens of millions
+    of rows that don't add to the story.
+  - Writes the combined result to a new, much smaller CSV that Power BI can
+    load comfortably.
+
+Usage:
+    python filter_aml_transactions.py INPUT_FILE.csv OUTPUT_FILE.csv [--ratio 10]
+
+Requirements:
+    pip install pandas
+"""
 
 import argparse
 import sys

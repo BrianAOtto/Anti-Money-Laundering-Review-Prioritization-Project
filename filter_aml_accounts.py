@@ -1,3 +1,32 @@
+"""
+Filters the IBM AML Account file down to only the accounts that are actually
+referenced in your already-filtered Transaction file.
+
+Why this works differently than the transaction filter:
+  The Transaction file was filtered by randomly sampling non-flagged rows,
+  because each transaction is its own independent event. The Account file
+  is different -- it's a lookup/reference table, so a random sample would
+  likely drop accounts that your filtered transactions still point to,
+  breaking the joins in Power BI. Instead, this script keeps exactly the
+  accounts your filtered transaction file needs -- no more, no less.
+
+What it does:
+  - Reads your filtered Transaction file (small, e.g. HI-Small_filtered.csv)
+    and builds a list of every (Bank, Account) pair used on either the
+    "From" side or the "To" side of a transaction.
+  - Reads the (huge) raw Account file in chunks, so it never loads the
+    whole thing into memory at once.
+  - Keeps only the Account rows whose (Bank ID, Account Number) match
+    something in that needed list.
+  - Writes the matched rows to a new, much smaller CSV.
+
+Usage:
+    python filter_aml_accounts.py FILTERED_TRANSACTION_FILE.csv ACCOUNT_FILE.csv OUTPUT_FILE.csv
+
+Requirements:
+    pip install pandas
+"""
+
 import sys
 
 import pandas as pd
@@ -52,6 +81,7 @@ def main():
 
     print(f"\nWrote {len(result):,} rows to {output_path}")
 
+    missing = len(needed_pairs) - len(result)
     if len(result) < len(needed_pairs):
         print(f"\nNote: {len(needed_pairs) - len(result.drop_duplicates()):,} referenced (Bank, Account) "
               f"pairs were not found in the Account file. This can happen if a bank/account "
