@@ -32,6 +32,10 @@ This sampling approach is disclosed explicitly throughout the dashboard — see 
 
 **Data modeling (Power BI):** The account lookup table was split into two role-playing dimensions — `Sender` and `Receiver` — each with its own active relationship back to the transactions table, since a single account table can't serve both roles with one relationship. Calculated columns (`RELATED()`) pull sender/receiver bank and entity names into the transaction table for readable reporting.
 
+![Data model view showing the fact table with role-playing Sender/Receiver account dimensions and the currency exchange rate table](data_model_screenshot.png)
+
+*The two lines connecting each account table to the transaction table represent one account list being used twice: once to identify who sent a payment, once to identify who received it — avoiding duplicate data while letting the dashboard report on both sides of every transaction.*
+
 **Currency normalization:** The raw dataset records `Amount Paid` in the transaction's original currency (USD, Euro, Ruble, Bitcoin, etc.), which makes any cross-currency sort or ranking analytically invalid if left unconverted — a $10,000 transaction and a ¥10,000 transaction are not the same size. A manually-built currency exchange rate lookup table and a calculated `Amount Paid (USD Equivalent)` column normalize every transaction to a common unit, making the prioritization ranking and KPI totals meaningful across currencies.
 
 **Dashboard components:**
